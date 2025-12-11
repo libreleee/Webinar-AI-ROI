@@ -95,11 +95,18 @@ class PayPalProcessor(PaymentProcessor):
 
 SOLID는 로버트 마틴(Robert C. Martin)이 제안한 5가지 객체 지향 설계 원칙입니다.
 
-### 2.1 단일 책임 원칙 (SRP: Single Responsibility Principle)
+### 2.1 단일 책임 원칙(SRP) 준수
 
-**"한 클래스는 하나의 책임만 가져야 한다"**
+**"한 클래스는 하나의 책임만 가져야 한다"**  
+**Single Responsibility Principle: A class should have only one reason to change**
 
-❌ **나쁜 예:**
+#### 왜 중요한가?
+- 코드 유지보수성 향상
+- 테스트 용이성 증가
+- 결합도(Coupling) 감소
+- 응집도(Cohesion) 증가
+
+#### ❌ SRP 위반 사례:
 ```python
 class User:
     def __init__(self, name, email):
@@ -108,36 +115,97 @@ class User:
     
     def save_to_database(self):
         # 데이터베이스 저장 로직
+        # 문제: User 클래스가 저장 책임도 가짐
         pass
     
     def send_email(self):
         # 이메일 발송 로직
+        # 문제: User 클래스가 이메일 발송 책임도 가짐
+        pass
+    
+    def generate_report(self):
+        # 보고서 생성 로직
+        # 문제: User 클래스가 보고서 생성 책임도 가짐
         pass
 ```
 
-✅ **좋은 예:**
+**문제점**:
+- User 클래스가 3가지 이유로 변경될 수 있음 (사용자 정보, 데이터베이스, 이메일, 보고서)
+- 데이터베이스가 변경되면 User 클래스 수정 필요
+- 이메일 로직이 변경되면 User 클래스 수정 필요
+
+#### ✅ SRP 준수 사례:
 ```python
 class User:
+    """사용자 정보만 관리"""
     def __init__(self, name, email):
         self.name = name
         self.email = email
+    
+    def get_name(self):
+        return self.name
+    
+    def get_email(self):
+        return self.email
 
 class UserRepository:
+    """사용자 데이터베이스 작업 전담"""
     def save(self, user):
         # 데이터베이스 저장 로직
+        print(f"Saving {user.name} to database")
+    
+    def find_by_email(self, email):
+        # 데이터베이스 조회 로직
+        pass
+    
+    def delete(self, user):
+        # 데이터베이스 삭제 로직
         pass
 
 class EmailService:
+    """이메일 발송 전담"""
     def send(self, user, message):
         # 이메일 발송 로직
-        pass
+        print(f"Sending email to {user.email}: {message}")
+    
+    def send_welcome_email(self, user):
+        self.send(user, "Welcome!")
+
+class UserReportGenerator:
+    """사용자 보고서 생성 전담"""
+    def generate(self, users):
+        # 보고서 생성 로직
+        print(f"Generating report for {len(users)} users")
+
+# 사용 예시
+user = User("John Doe", "john@example.com")
+repository = UserRepository()
+email_service = EmailService()
+report_generator = UserReportGenerator()
+
+repository.save(user)
+email_service.send_welcome_email(user)
+report_generator.generate([user])
 ```
 
-### 2.2 개방/폐쇄 원칙 (OCP: Open/Closed Principle)
+**장점**:
+- 각 클래스가 단일 책임만 가짐
+- 변경 사항이 한 클래스에만 영향
+- 테스트가 쉬움
+- 재사용성 증가
 
-**"소프트웨어 엔티티는 확장에는 열려 있어야 하고, 수정에는 닫혀 있어야 한다"**
+### 2.2 개방/폐쇄 원칙(OCP) 준수
 
-❌ **나쁜 예:**
+**"소프트웨어 엔티티는 확장에는 열려 있어야 하고, 수정에는 닫혀 있어야 한다"**  
+**Open/Closed Principle: Open for extension, closed for modification**
+
+#### 왜 중요한가?
+- 기존 코드 수정 없이 새로운 기능 추가
+- 버그 발생 위험 감소
+- 시스템 안정성 향상
+- 유연한 설계
+
+#### ❌ OCP 위반 사례:
 ```java
 class DiscountCalculator {
     public double calculate(String customerType, double amount) {
@@ -148,13 +216,20 @@ class DiscountCalculator {
         } else if (customerType.equals("VIP")) {
             return amount * 0.3;
         }
+        // 새로운 고객 타입 추가 시 이 메서드를 수정해야 함!
         return 0;
     }
 }
 ```
 
-✅ **좋은 예:**
+**문제점**:
+- 새로운 고객 타입 추가 시 기존 코드 수정 필요
+- if-else 체인이 길어질수록 복잡도 증가
+- 수정 시 기존 로직에 버그 발생 가능성
+
+#### ✅ OCP 준수 사례:
 ```java
+// 추상화를 통한 확장 가능한 설계
 interface DiscountStrategy {
     double calculate(double amount);
 }
@@ -177,6 +252,19 @@ class VIPDiscount implements DiscountStrategy {
     }
 }
 
+// 새로운 고객 타입 추가 - 기존 코드 수정 없음!
+class GoldDiscount implements DiscountStrategy {
+    public double calculate(double amount) {
+        return amount * 0.35;
+    }
+}
+
+class PlatinumDiscount implements DiscountStrategy {
+    public double calculate(double amount) {
+        return amount * 0.4;
+    }
+}
+
 class DiscountCalculator {
     private DiscountStrategy strategy;
     
@@ -187,8 +275,78 @@ class DiscountCalculator {
     public double calculate(double amount) {
         return strategy.calculate(amount);
     }
+    
+    // 전략 변경 가능
+    public void setStrategy(DiscountStrategy strategy) {
+        this.strategy = strategy;
+    }
 }
+
+// 사용 예시
+DiscountCalculator calculator = new DiscountCalculator(new RegularDiscount());
+System.out.println(calculator.calculate(100));  // 10.0
+
+calculator.setStrategy(new VIPDiscount());
+System.out.println(calculator.calculate(100));  // 30.0
+
+calculator.setStrategy(new GoldDiscount());
+System.out.println(calculator.calculate(100));  // 35.0
 ```
+
+#### Python에서의 OCP 준수:
+```python
+from abc import ABC, abstractmethod
+
+class PaymentMethod(ABC):
+    """확장 가능한 결제 방법 인터페이스"""
+    @abstractmethod
+    def process(self, amount):
+        pass
+
+class CreditCardPayment(PaymentMethod):
+    def process(self, amount):
+        print(f"Processing ${amount} via Credit Card")
+        return True
+
+class PayPalPayment(PaymentMethod):
+    def process(self, amount):
+        print(f"Processing ${amount} via PayPal")
+        return True
+
+class BitcoinPayment(PaymentMethod):
+    def process(self, amount):
+        print(f"Processing ${amount} via Bitcoin")
+        return True
+
+# 새로운 결제 방법 추가 - 기존 코드 수정 없음!
+class ApplePayPayment(PaymentMethod):
+    def process(self, amount):
+        print(f"Processing ${amount} via Apple Pay")
+        return True
+
+class PaymentProcessor:
+    def __init__(self, payment_method: PaymentMethod):
+        self.payment_method = payment_method
+    
+    def checkout(self, amount):
+        return self.payment_method.process(amount)
+
+# 사용 예시
+processor = PaymentProcessor(CreditCardPayment())
+processor.checkout(100)
+
+processor = PaymentProcessor(BitcoinPayment())
+processor.checkout(200)
+
+processor = PaymentProcessor(ApplePayPayment())
+processor.checkout(300)
+```
+
+**장점**:
+- 새로운 기능 추가 시 기존 코드 안전
+- 확장이 용이함
+- 다형성 활용
+- 테스트가 독립적
 
 ### 2.3 리스코프 치환 원칙 (LSP: Liskov Substitution Principle)
 
@@ -264,53 +422,233 @@ class Robot implements Workable {
 }
 ```
 
-### 2.5 의존성 역전 원칙 (DIP: Dependency Inversion Principle)
+### 2.5 의존성 역전 원칙(DIP) 준수
 
-**"고수준 모듈은 저수준 모듈에 의존해서는 안 되며, 둘 다 추상화에 의존해야 한다"**
+**"고수준 모듈은 저수준 모듈에 의존해서는 안 되며, 둘 다 추상화에 의존해야 한다"**  
+**Dependency Inversion Principle: Depend on abstractions, not concretions**
 
-❌ **나쁜 예:**
+#### 왜 중요한가?
+- 느슨한 결합(Loose Coupling)
+- 테스트 용이성 (Mock 객체 사용 가능)
+- 유연한 시스템 구조
+- 의존성 주입(Dependency Injection) 가능
+
+#### ❌ DIP 위반 사례:
 ```python
 class MySQLDatabase:
+    """구체적인 데이터베이스 구현"""
     def save(self, data):
-        print(f"Saving {data} to MySQL")
+        print(f"Saving {data} to MySQL database")
+    
+    def find(self, id):
+        print(f"Finding {id} in MySQL")
+        return None
 
 class UserService:
     def __init__(self):
-        self.database = MySQLDatabase()  # 구체적인 클래스에 의존
+        # 문제: 구체적인 클래스에 직접 의존
+        self.database = MySQLDatabase()
     
     def save_user(self, user):
         self.database.save(user)
+    
+    def get_user(self, user_id):
+        return self.database.find(user_id)
+
+# 사용
+service = UserService()
+service.save_user("John")
 ```
 
-✅ **좋은 예:**
+**문제점**:
+- PostgreSQL로 변경하려면 UserService 코드 수정 필요
+- 테스트 시 실제 MySQL 데이터베이스 필요
+- UserService가 MySQLDatabase에 강하게 결합됨
+- 다른 데이터베이스로 교체 어려움
+
+#### ✅ DIP 준수 사례:
 ```python
 from abc import ABC, abstractmethod
 
+# 추상화 (인터페이스)
 class Database(ABC):
+    """데이터베이스 인터페이스 - 추상화"""
     @abstractmethod
     def save(self, data):
         pass
+    
+    @abstractmethod
+    def find(self, id):
+        pass
+    
+    @abstractmethod
+    def delete(self, id):
+        pass
 
+# 구체적인 구현들
 class MySQLDatabase(Database):
+    """MySQL 구현"""
     def save(self, data):
         print(f"Saving {data} to MySQL")
+    
+    def find(self, id):
+        print(f"Finding {id} in MySQL")
+        return None
+    
+    def delete(self, id):
+        print(f"Deleting {id} from MySQL")
 
 class PostgreSQLDatabase(Database):
+    """PostgreSQL 구현"""
     def save(self, data):
         print(f"Saving {data} to PostgreSQL")
+    
+    def find(self, id):
+        print(f"Finding {id} in PostgreSQL")
+        return None
+    
+    def delete(self, id):
+        print(f"Deleting {id} from PostgreSQL")
+
+class MongoDBDatabase(Database):
+    """MongoDB 구현"""
+    def save(self, data):
+        print(f"Saving {data} to MongoDB")
+    
+    def find(self, id):
+        print(f"Finding {id} in MongoDB")
+        return None
+    
+    def delete(self, id):
+        print(f"Deleting {id} from MongoDB")
 
 class UserService:
+    """고수준 모듈 - 추상화에 의존"""
     def __init__(self, database: Database):
-        self.database = database  # 추상화에 의존
+        # 중요: 추상화(Database)에 의존
+        self.database = database
     
     def save_user(self, user):
         self.database.save(user)
+    
+    def get_user(self, user_id):
+        return self.database.find(user_id)
+    
+    def remove_user(self, user_id):
+        self.database.delete(user_id)
 
-# 사용
+# 사용 예시 - 유연한 데이터베이스 선택
 mysql_db = MySQLDatabase()
 user_service = UserService(mysql_db)
 user_service.save_user("John")
+
+# PostgreSQL로 쉽게 교체 가능
+postgres_db = PostgreSQLDatabase()
+user_service = UserService(postgres_db)
+user_service.save_user("Jane")
+
+# MongoDB로도 쉽게 교체 가능
+mongo_db = MongoDBDatabase()
+user_service = UserService(mongo_db)
+user_service.save_user("Bob")
 ```
+
+#### Java에서의 DIP 준수:
+```java
+// 추상화
+interface MessageSender {
+    void send(String message, String recipient);
+}
+
+// 구체적인 구현들
+class EmailSender implements MessageSender {
+    public void send(String message, String recipient) {
+        System.out.println("Sending email to " + recipient + ": " + message);
+    }
+}
+
+class SMSSender implements MessageSender {
+    public void send(String message, String recipient) {
+        System.out.println("Sending SMS to " + recipient + ": " + message);
+    }
+}
+
+class PushNotificationSender implements MessageSender {
+    public void send(String message, String recipient) {
+        System.out.println("Sending push notification to " + recipient + ": " + message);
+    }
+}
+
+// 고수준 모듈
+class NotificationService {
+    private MessageSender messageSender;
+    
+    // 의존성 주입 (Dependency Injection)
+    public NotificationService(MessageSender messageSender) {
+        this.messageSender = messageSender;
+    }
+    
+    public void notify(String message, String recipient) {
+        messageSender.send(message, recipient);
+    }
+    
+    // Setter 주입도 가능
+    public void setMessageSender(MessageSender messageSender) {
+        this.messageSender = messageSender;
+    }
+}
+
+// 사용 예시
+NotificationService service = new NotificationService(new EmailSender());
+service.notify("Hello!", "user@example.com");
+
+// 런타��에 전략 변경 가능
+service.setMessageSender(new SMSSender());
+service.notify("Hello!", "+1234567890");
+
+service.setMessageSender(new PushNotificationSender());
+service.notify("Hello!", "user_device_id");
+```
+
+#### 테스트에서의 DIP 활용:
+```python
+class MockDatabase(Database):
+    """테스트용 Mock 데이터베이스"""
+    def __init__(self):
+        self.saved_data = []
+    
+    def save(self, data):
+        self.saved_data.append(data)
+        return True
+    
+    def find(self, id):
+        return self.saved_data[id] if id < len(self.saved_data) else None
+    
+    def delete(self, id):
+        if id < len(self.saved_data):
+            del self.saved_data[id]
+
+# 단위 테스트
+def test_user_service():
+    # 실제 데이터베이스 대신 Mock 사용
+    mock_db = MockDatabase()
+    service = UserService(mock_db)
+    
+    # 테스트
+    service.save_user("Test User")
+    assert len(mock_db.saved_data) == 1
+    assert mock_db.saved_data[0] == "Test User"
+    
+    print("✅ Test passed!")
+
+test_user_service()
+```
+
+**DIP의 핵심 장점**:
+1. **교체 가능성**: 구현체를 쉽게 교체 가능
+2. **테스트 용이**: Mock 객체로 단위 테스트 가능
+3. **느슨한 결합**: 모듈 간 독립성 증가
+4. **확장성**: 새로운 구현 추가 용이
 
 ---
 
@@ -493,94 +831,6 @@ adapter = Adapter(euro_socket)
 print(adapter.voltage())  # 115
 ```
 
-#### 🌉 브리지 패턴 (Bridge Pattern)
-**목적**: 추상화와 구현을 분리하여 독립적으로 변경 가능
-
-```java
-interface Device {
-    void turnOn();
-    void turnOff();
-}
-
-class TV implements Device {
-    public void turnOn() { System.out.println("TV ON"); }
-    public void turnOff() { System.out.println("TV OFF"); }
-}
-
-class Radio implements Device {
-    public void turnOn() { System.out.println("Radio ON"); }
-    public void turnOff() { System.out.println("Radio OFF"); }
-}
-
-abstract class RemoteControl {
-    protected Device device;
-    
-    public RemoteControl(Device device) {
-        this.device = device;
-    }
-    
-    abstract void power();
-}
-
-class BasicRemote extends RemoteControl {
-    public BasicRemote(Device device) {
-        super(device);
-    }
-    
-    public void power() {
-        device.turnOn();
-    }
-}
-```
-
-#### 🌳 컴포지트 패턴 (Composite Pattern)
-**목적**: 객체들을 트리 구조로 구성하여 부분-전체 계층 표현
-
-```python
-class FileSystemComponent:
-    def __init__(self, name):
-        self.name = name
-    
-    def display(self, indent=0):
-        pass
-
-class File(FileSystemComponent):
-    def __init__(self, name, size):
-        super().__init__(name)
-        self.size = size
-    
-    def display(self, indent=0):
-        print(" " * indent + f"📄 {self.name} ({self.size}KB)")
-
-class Directory(FileSystemComponent):
-    def __init__(self, name):
-        super().__init__(name)
-        self.children = []
-    
-    def add(self, component):
-        self.children.append(component)
-    
-    def display(self, indent=0):
-        print(" " * indent + f"📁 {self.name}")
-        for child in self.children:
-            child.display(indent + 2)
-
-# 사용
-root = Directory("root")
-home = Directory("home")
-documents = Directory("documents")
-
-file1 = File("resume.pdf", 120)
-file2 = File("photo.jpg", 500)
-
-documents.add(file1)
-home.add(documents)
-home.add(file2)
-root.add(home)
-
-root.display()
-```
-
 #### 🎁 데코레이터 패턴 (Decorator Pattern)
 **목적**: 객체에 동적으로 새로운 기능 추가
 
@@ -620,400 +870,7 @@ print(f"{coffee.description()}: ${coffee.cost()}")
 # Coffee, Milk, Sugar: $8
 ```
 
-#### 🏛️ 파사드 패턴 (Facade Pattern)
-**목적**: 복잡한 시스템에 간단한 인터페이스 제공
-
-```java
-class CPU {
-    public void freeze() { System.out.println("CPU freeze"); }
-    public void jump(long position) { System.out.println("CPU jump"); }
-    public void execute() { System.out.println("CPU execute"); }
-}
-
-class Memory {
-    public void load(long position, byte[] data) {
-        System.out.println("Memory load");
-    }
-}
-
-class HardDrive {
-    public byte[] read(long lba, int size) {
-        System.out.println("HardDrive read");
-        return new byte[size];
-    }
-}
-
-class ComputerFacade {
-    private CPU cpu;
-    private Memory memory;
-    private HardDrive hardDrive;
-    
-    public ComputerFacade() {
-        this.cpu = new CPU();
-        this.memory = new Memory();
-        this.hardDrive = new HardDrive();
-    }
-    
-    public void start() {
-        cpu.freeze();
-        memory.load(0, hardDrive.read(0, 1024));
-        cpu.jump(0);
-        cpu.execute();
-    }
-}
-
-// 사용
-ComputerFacade computer = new ComputerFacade();
-computer.start();
-```
-
-#### 🪶 플라이웨이트 패턴 (Flyweight Pattern)
-**목적**: 공유를 통해 메모리 사용 최소화
-
-```python
-class TreeType:
-    def __init__(self, name, color, texture):
-        self.name = name
-        self.color = color
-        self.texture = texture
-    
-    def draw(self, x, y):
-        print(f"Drawing {self.name} tree at ({x}, {y})")
-
-class TreeFactory:
-    _tree_types = {}
-    
-    @classmethod
-    def get_tree_type(cls, name, color, texture):
-        key = (name, color, texture)
-        if key not in cls._tree_types:
-            cls._tree_types[key] = TreeType(name, color, texture)
-        return cls._tree_types[key]
-
-class Tree:
-    def __init__(self, x, y, tree_type):
-        self.x = x
-        self.y = y
-        self.tree_type = tree_type
-    
-    def draw(self):
-        self.tree_type.draw(self.x, self.y)
-
-# 사용
-factory = TreeFactory()
-oak_type = factory.get_tree_type("Oak", "Green", "Rough")
-
-trees = [
-    Tree(10, 20, oak_type),
-    Tree(30, 40, oak_type),  # 같은 TreeType 공유
-    Tree(50, 60, oak_type)
-]
-```
-
-#### 🛡️ 프록시 패턴 (Proxy Pattern)
-**목적**: 다른 객체에 대한 접근을 제어하는 대리자
-
-```python
-from abc import ABC, abstractmethod
-
-class Image(ABC):
-    @abstractmethod
-    def display(self):
-        pass
-
-class RealImage(Image):
-    def __init__(self, filename):
-        self.filename = filename
-        self._load_from_disk()
-    
-    def _load_from_disk(self):
-        print(f"Loading {self.filename}")
-    
-    def display(self):
-        print(f"Displaying {self.filename}")
-
-class ImageProxy(Image):
-    def __init__(self, filename):
-        self.filename = filename
-        self._real_image = None
-    
-    def display(self):
-        if self._real_image is None:
-            self._real_image = RealImage(self.filename)
-        self._real_image.display()
-
-# 사용
-image = ImageProxy("photo.jpg")
-# 이미지는 아직 로드되지 않음
-image.display()  # 이제 로드됨
-image.display()  # 캐시된 이미지 사용
-```
-
 ### 3.3 행위 패턴 (Behavioral Patterns)
-
-#### 🔗 책임 연쇄 패턴 (Chain of Responsibility Pattern)
-**목적**: 요청을 처리할 수 있는 객체가 나올 때까지 전달
-
-```java
-abstract class Logger {
-    public static int INFO = 1;
-    public static int DEBUG = 2;
-    public static int ERROR = 3;
-    
-    protected int level;
-    protected Logger nextLogger;
-    
-    public void setNextLogger(Logger nextLogger) {
-        this.nextLogger = nextLogger;
-    }
-    
-    public void logMessage(int level, String message) {
-        if (this.level <= level) {
-            write(message);
-        }
-        if (nextLogger != null) {
-            nextLogger.logMessage(level, message);
-        }
-    }
-    
-    abstract protected void write(String message);
-}
-
-class ConsoleLogger extends Logger {
-    public ConsoleLogger(int level) {
-        this.level = level;
-    }
-    
-    protected void write(String message) {
-        System.out.println("Console: " + message);
-    }
-}
-
-class FileLogger extends Logger {
-    public FileLogger(int level) {
-        this.level = level;
-    }
-    
-    protected void write(String message) {
-        System.out.println("File: " + message);
-    }
-}
-```
-
-#### 💬 커맨드 패턴 (Command Pattern)
-**목적**: 요청을 객체로 캡슐화하여 매개변수화
-
-```python
-from abc import ABC, abstractmethod
-
-class Command(ABC):
-    @abstractmethod
-    def execute(self):
-        pass
-    
-    @abstractmethod
-    def undo(self):
-        pass
-
-class Light:
-    def on(self):
-        print("Light is ON")
-    
-    def off(self):
-        print("Light is OFF")
-
-class LightOnCommand(Command):
-    def __init__(self, light):
-        self.light = light
-    
-    def execute(self):
-        self.light.on()
-    
-    def undo(self):
-        self.light.off()
-
-class LightOffCommand(Command):
-    def __init__(self, light):
-        self.light = light
-    
-    def execute(self):
-        self.light.off()
-    
-    def undo(self):
-        self.light.on()
-
-class RemoteControl:
-    def __init__(self):
-        self.history = []
-    
-    def execute_command(self, command):
-        command.execute()
-        self.history.append(command)
-    
-    def undo_last(self):
-        if self.history:
-            command = self.history.pop()
-            command.undo()
-
-# 사용
-light = Light()
-light_on = LightOnCommand(light)
-light_off = LightOffCommand(light)
-
-remote = RemoteControl()
-remote.execute_command(light_on)
-remote.execute_command(light_off)
-remote.undo_last()
-```
-
-#### 🔁 반복자 패턴 (Iterator Pattern)
-**목적**: 내부 구조를 노출하지 않고 순차적으로 접근
-
-```python
-class Book:
-    def __init__(self, title):
-        self.title = title
-
-class BookCollection:
-    def __init__(self):
-        self._books = []
-    
-    def add_book(self, book):
-        self._books.append(book)
-    
-    def __iter__(self):
-        return BookIterator(self._books)
-
-class BookIterator:
-    def __init__(self, books):
-        self._books = books
-        self._index = 0
-    
-    def __next__(self):
-        if self._index < len(self._books):
-            book = self._books[self._index]
-            self._index += 1
-            return book
-        raise StopIteration
-
-# 사용
-collection = BookCollection()
-collection.add_book(Book("Design Patterns"))
-collection.add_book(Book("Clean Code"))
-
-for book in collection:
-    print(book.title)
-```
-
-#### 🤝 중재자 패턴 (Mediator Pattern)
-**목적**: 객체 간의 복잡한 통신을 캡슐화
-
-```java
-interface ChatMediator {
-    void sendMessage(String message, User user);
-    void addUser(User user);
-}
-
-class ChatRoom implements ChatMediator {
-    private List<User> users = new ArrayList<>();
-    
-    public void addUser(User user) {
-        users.add(user);
-    }
-    
-    public void sendMessage(String message, User sender) {
-        for (User user : users) {
-            if (user != sender) {
-                user.receive(message);
-            }
-        }
-    }
-}
-
-abstract class User {
-    protected ChatMediator mediator;
-    protected String name;
-    
-    public User(ChatMediator mediator, String name) {
-        this.mediator = mediator;
-        this.name = name;
-    }
-    
-    public abstract void send(String message);
-    public abstract void receive(String message);
-}
-
-class ConcreteUser extends User {
-    public ConcreteUser(ChatMediator mediator, String name) {
-        super(mediator, name);
-    }
-    
-    public void send(String message) {
-        System.out.println(name + " sends: " + message);
-        mediator.sendMessage(message, this);
-    }
-    
-    public void receive(String message) {
-        System.out.println(name + " receives: " + message);
-    }
-}
-```
-
-#### 💾 메멘토 패턴 (Memento Pattern)
-**목적**: 객체의 상태를 저장하고 복원
-
-```python
-class EditorMemento:
-    def __init__(self, content):
-        self._content = content
-    
-    def get_content(self):
-        return self._content
-
-class Editor:
-    def __init__(self):
-        self._content = ""
-    
-    def type(self, text):
-        self._content += text
-    
-    def get_content(self):
-        return self._content
-    
-    def save(self):
-        return EditorMemento(self._content)
-    
-    def restore(self, memento):
-        self._content = memento.get_content()
-
-class History:
-    def __init__(self):
-        self._mementos = []
-    
-    def push(self, memento):
-        self._mementos.append(memento)
-    
-    def pop(self):
-        if self._mementos:
-            return self._mementos.pop()
-        return None
-
-# 사용
-editor = Editor()
-history = History()
-
-editor.type("Hello ")
-history.push(editor.save())
-
-editor.type("World!")
-history.push(editor.save())
-
-editor.type(" How are you?")
-print(editor.get_content())  # Hello World! How are you?
-
-editor.restore(history.pop())
-print(editor.get_content())  # Hello World!
-```
 
 #### 👁️ 옵저버 패턴 (Observer Pattern)
 **목적**: 객체의 상태 변화를 관찰자들에게 자동 통지
@@ -1055,8 +912,6 @@ subject.attach(observer1)
 subject.attach(observer2)
 
 subject.set_state("State A")
-# Observer 1 received update: State A
-# Observer 2 received update: State A
 ```
 
 #### 🎯 전략 패턴 (Strategy Pattern)
@@ -1102,481 +957,183 @@ class ShoppingCart {
         paymentStrategy.pay(amount);
     }
 }
-
-// 사용
-ShoppingCart cart = new ShoppingCart();
-cart.setPaymentStrategy(new CreditCardStrategy("1234-5678"));
-cart.checkout(100);
-
-cart.setPaymentStrategy(new PayPalStrategy("user@example.com"));
-cart.checkout(200);
-```
-
-#### 📋 템플릿 메서드 패턴 (Template Method Pattern)
-**목적**: 알고리즘의 구조를 정의하고 세부 단계는 서브클래스에서 구현
-
-```python
-from abc import ABC, abstractmethod
-
-class DataMiner(ABC):
-    def mine(self, path):
-        file = self.open_file(path)
-        data = self.extract_data(file)
-        parsed_data = self.parse_data(data)
-        analysis = self.analyze_data(parsed_data)
-        self.send_report(analysis)
-        self.close_file(file)
-    
-    def open_file(self, path):
-        print(f"Opening file: {path}")
-        return path
-    
-    @abstractmethod
-    def extract_data(self, file):
-        pass
-    
-    @abstractmethod
-    def parse_data(self, data):
-        pass
-    
-    def analyze_data(self, data):
-        print("Analyzing data...")
-        return data
-    
-    def send_report(self, analysis):
-        print("Sending report...")
-    
-    def close_file(self, file):
-        print("Closing file...")
-
-class PDFDataMiner(DataMiner):
-    def extract_data(self, file):
-        print("Extracting data from PDF")
-        return "PDF data"
-    
-    def parse_data(self, data):
-        print("Parsing PDF data")
-        return "Parsed PDF"
-
-class CSVDataMiner(DataMiner):
-    def extract_data(self, file):
-        print("Extracting data from CSV")
-        return "CSV data"
-    
-    def parse_data(self, data):
-        print("Parsing CSV data")
-        return "Parsed CSV"
-
-# 사용
-pdf_miner = PDFDataMiner()
-pdf_miner.mine("data.pdf")
-```
-
-#### 🚦 상태 패턴 (State Pattern)
-**목적**: 객체의 내부 상태에 따라 행위를 변경
-
-```java
-interface State {
-    void insertCoin();
-    void ejectCoin();
-    void dispense();
-}
-
-class NoCoinState implements State {
-    private VendingMachine machine;
-    
-    public NoCoinState(VendingMachine machine) {
-        this.machine = machine;
-    }
-    
-    public void insertCoin() {
-        System.out.println("Coin inserted");
-        machine.setState(machine.getHasCoinState());
-    }
-    
-    public void ejectCoin() {
-        System.out.println("No coin to eject");
-    }
-    
-    public void dispense() {
-        System.out.println("Insert coin first");
-    }
-}
-
-class HasCoinState implements State {
-    private VendingMachine machine;
-    
-    public HasCoinState(VendingMachine machine) {
-        this.machine = machine;
-    }
-    
-    public void insertCoin() {
-        System.out.println("Coin already inserted");
-    }
-    
-    public void ejectCoin() {
-        System.out.println("Coin ejected");
-        machine.setState(machine.getNoCoinState());
-    }
-    
-    public void dispense() {
-        System.out.println("Dispensing product");
-        machine.setState(machine.getNoCoinState());
-    }
-}
-
-class VendingMachine {
-    private State noCoinState;
-    private State hasCoinState;
-    private State currentState;
-    
-    public VendingMachine() {
-        noCoinState = new NoCoinState(this);
-        hasCoinState = new HasCoinState(this);
-        currentState = noCoinState;
-    }
-    
-    public void setState(State state) {
-        currentState = state;
-    }
-    
-    public State getNoCoinState() { return noCoinState; }
-    public State getHasCoinState() { return hasCoinState; }
-    
-    public void insertCoin() { currentState.insertCoin(); }
-    public void ejectCoin() { currentState.ejectCoin(); }
-    public void dispense() { currentState.dispense(); }
-}
-```
-
-#### 🔍 방문자 패턴 (Visitor Pattern)
-**목적**: 객체 구조와 알고리즘을 분리
-
-```python
-from abc import ABC, abstractmethod
-
-class Visitor(ABC):
-    @abstractmethod
-    def visit_book(self, book):
-        pass
-    
-    @abstractmethod
-    def visit_fruit(self, fruit):
-        pass
-
-class ShoppingCartVisitor(Visitor):
-    def visit_book(self, book):
-        cost = book.price
-        print(f"Book: {book.title} costs ${cost}")
-        return cost
-    
-    def visit_fruit(self, fruit):
-        cost = fruit.price_per_kg * fruit.weight
-        print(f"Fruit: {fruit.name} costs ${cost}")
-        return cost
-
-class Book:
-    def __init__(self, title, price):
-        self.title = title
-        self.price = price
-    
-    def accept(self, visitor):
-        return visitor.visit_book(self)
-
-class Fruit:
-    def __init__(self, name, price_per_kg, weight):
-        self.name = name
-        self.price_per_kg = price_per_kg
-        self.weight = weight
-    
-    def accept(self, visitor):
-        return visitor.visit_fruit(self)
-
-# 사용
-items = [
-    Book("Design Patterns", 45),
-    Fruit("Apple", 2, 3),
-    Book("Clean Code", 50)
-]
-
-visitor = ShoppingCartVisitor()
-total = sum(item.accept(visitor) for item in items)
-print(f"Total cost: ${total}")
 ```
 
 ---
 
 ## 4. 실무 적용 사례
 
-### 4.1 전자상거래 시스템
+### 4.1 전자상거래 시스템에서 SOLID 원칙 적용
 
 ```python
-# Strategy Pattern + Factory Pattern
-class PaymentProcessor:
+# SRP 준수: 각 클래스가 단일 책임
+class Product:
+    """상품 정보만 관리"""
+    def __init__(self, name, price):
+        self.name = name
+        self.price = price
+
+class Order:
+    """주문 정보만 관리"""
     def __init__(self):
-        self._strategies = {
-            'credit_card': CreditCardStrategy(),
-            'paypal': PayPalStrategy(),
-            'bank_transfer': BankTransferStrategy()
-        }
+        self.items = []
     
-    def process(self, payment_type, amount):
-        strategy = self._strategies.get(payment_type)
-        if strategy:
-            return strategy.pay(amount)
-        raise ValueError(f"Unknown payment type: {payment_type}")
+    def add_item(self, product, quantity):
+        self.items.append({"product": product, "quantity": quantity})
 
-# Observer Pattern for order tracking
-class Order(Subject):
-    def __init__(self, order_id):
-        super().__init__()
-        self.order_id = order_id
-        self.status = "Pending"
-    
-    def update_status(self, new_status):
-        self.status = new_status
-        self.set_state(f"Order {self.order_id}: {new_status}")
+class OrderCalculator:
+    """주문 금액 계산 전담"""
+    def calculate_total(self, order):
+        total = 0
+        for item in order.items:
+            total += item["product"].price * item["quantity"]
+        return total
 
-# Singleton for configuration
-class ConfigManager:
-    _instance = None
+# OCP 준수: 확장 가능한 할인 전략
+from abc import ABC, abstractmethod
+
+class DiscountStrategy(ABC):
+    @abstractmethod
+    def apply_discount(self, amount):
+        pass
+
+class NoDiscount(DiscountStrategy):
+    def apply_discount(self, amount):
+        return amount
+
+class SeasonalDiscount(DiscountStrategy):
+    def apply_discount(self, amount):
+        return amount * 0.9  # 10% 할인
+
+class LoyaltyDiscount(DiscountStrategy):
+    def apply_discount(self, amount):
+        return amount * 0.85  # 15% 할인
+
+# DIP 준수: 추상화에 의존
+class PaymentGateway(ABC):
+    @abstractmethod
+    def process_payment(self, amount):
+        pass
+
+class StripeGateway(PaymentGateway):
+    def process_payment(self, amount):
+        print(f"Processing ${amount} via Stripe")
+
+class PayPalGateway(PaymentGateway):
+    def process_payment(self, amount):
+        print(f"Processing ${amount} via PayPal")
+
+class CheckoutService:
+    """고수준 모듈 - 추상화에 의존"""
+    def __init__(self, calculator, discount_strategy, payment_gateway):
+        self.calculator = calculator
+        self.discount_strategy = discount_strategy
+        self.payment_gateway = payment_gateway
     
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-            cls._instance.config = {}
-        return cls._instance
+    def checkout(self, order):
+        total = self.calculator.calculate_total(order)
+        discounted = self.discount_strategy.apply_discount(total)
+        self.payment_gateway.process_payment(discounted)
+
+# 사용 예시
+product1 = Product("Laptop", 1000)
+product2 = Product("Mouse", 50)
+
+order = Order()
+order.add_item(product1, 1)
+order.add_item(product2, 2)
+
+calculator = OrderCalculator()
+discount = SeasonalDiscount()
+payment = StripeGateway()
+
+checkout = CheckoutService(calculator, discount, payment)
+checkout.checkout(order)
 ```
 
-### 4.2 게임 개발
+### 4.2 게임 개발에서 디자인 패턴 적용
 
 ```java
-// State Pattern for game characters
+// State Pattern + Command Pattern
 interface CharacterState {
-    void handleInput(Character character, String input);
+    void handleInput(Character character, GameCommand command);
 }
 
 class IdleState implements CharacterState {
-    public void handleInput(Character character, String input) {
-        if (input.equals("JUMP")) {
+    public void handleInput(Character character, GameCommand command) {
+        if (command instanceof JumpCommand) {
+            command.execute();
             character.setState(new JumpingState());
-        } else if (input.equals("ATTACK")) {
-            character.setState(new AttackingState());
         }
     }
 }
 
-// Command Pattern for game actions
 interface GameCommand {
     void execute();
     void undo();
 }
 
-class MoveCommand implements GameCommand {
+class JumpCommand implements GameCommand {
     private Character character;
-    private int x, y;
-    private int prevX, prevY;
     
     public void execute() {
-        prevX = character.getX();
-        prevY = character.getY();
-        character.moveTo(x, y);
+        character.jump();
     }
     
     public void undo() {
-        character.moveTo(prevX, prevY);
-    }
-}
-
-// Flyweight Pattern for game objects
-class TreeFactory {
-    private static Map<String, TreeType> treeTypes = new HashMap<>();
-    
-    public static TreeType getTreeType(String name, Color color) {
-        String key = name + color;
-        if (!treeTypes.containsKey(key)) {
-            treeTypes.put(key, new TreeType(name, color));
-        }
-        return treeTypes.get(key);
-    }
-}
-```
-
-### 4.3 웹 애플리케이션
-
-```python
-# Decorator Pattern for middleware
-class Middleware:
-    def __init__(self, app):
-        self.app = app
-    
-    def __call__(self, request):
-        return self.app(request)
-
-class AuthenticationMiddleware(Middleware):
-    def __call__(self, request):
-        if not request.user.is_authenticated:
-            return Response("Unauthorized", 401)
-        return self.app(request)
-
-class LoggingMiddleware(Middleware):
-    def __call__(self, request):
-        print(f"Request: {request.method} {request.path}")
-        response = self.app(request)
-        print(f"Response: {response.status_code}")
-        return response
-
-# Proxy Pattern for caching
-class CachedAPI:
-    def __init__(self, api):
-        self.api = api
-        self.cache = {}
-    
-    def get(self, url):
-        if url not in self.cache:
-            self.cache[url] = self.api.get(url)
-        return self.cache[url]
-
-# Facade Pattern for complex operations
-class UserRegistrationFacade:
-    def __init__(self):
-        self.validator = UserValidator()
-        self.db = Database()
-        self.email_service = EmailService()
-    
-    def register(self, user_data):
-        if not self.validator.validate(user_data):
-            return False
-        
-        user = self.db.create_user(user_data)
-        self.email_service.send_welcome_email(user)
-        return True
-```
-
----
-
-## 5. 안티패턴 (피해야 할 것들)
-
-### 5.1 God Object (신 객체)
-❌ 하나의 클래스가 너무 많은 책임을 가짐
-```python
-class Application:  # 너무 많은 책임!
-    def handle_http_request(self): pass
-    def connect_database(self): pass
-    def send_email(self): pass
-    def process_payment(self): pass
-    def generate_report(self): pass
-```
-
-### 5.2 Spaghetti Code (스파게티 코드)
-❌ 구조 없이 얽혀있는 코드
-```java
-public void processOrder(Order order) {
-    if (order != null) {
-        if (order.getItems().size() > 0) {
-            for (Item item : order.getItems()) {
-                if (item.getStock() > 0) {
-                    // 중첩된 로직들...
-                }
-            }
-        }
-    }
-}
-```
-
-### 5.3 Lava Flow (용암 흐름)
-❌ 오래되고 사용되지 않는 코드가 남아있음
-```python
-def old_function():  # 아무도 호출하지 않음
-    # 오래된 로직...
-    pass
-
-def deprecated_method():  # TODO: 제거 필요
-    pass
-```
-
----
-
-## 6. 베스트 프랙티스
-
-### ✅ 1. YAGNI (You Aren't Gonna Need It)
-필요하지 않은 기능은 구현하지 말 것
-
-### ✅ 2. DRY (Don't Repeat Yourself)
-코드 중복을 피하고 재사용 가능한 컴포넌트 작성
-
-### ✅ 3. KISS (Keep It Simple, Stupid)
-단순하고 명확한 설계를 유지
-
-### ✅ 4. Composition Over Inheritance
-상속보다는 조합을 선호
-
-```python
-# ❌ 상속 남용
-class FlyingCar(Car, Airplane):
-    pass
-
-# ✅ 조합 사용
-class FlyingCar:
-    def __init__(self):
-        self.car_engine = CarEngine()
-        self.airplane_wings = Wings()
-```
-
-### ✅ 5. Dependency Injection
-의존성을 외부에서 주입
-
-```java
-// ✅ 좋은 예
-class UserService {
-    private UserRepository repository;
-    
-    public UserService(UserRepository repository) {
-        this.repository = repository;  // 주입받음
+        character.land();
     }
 }
 ```
 
 ---
 
-## 7. 추가 학습 자료
+## 5. 베스트 프랙티스
+
+### ✅ SOLID 원칙을 실무에 적용하는 방법
+
+1. **SRP 준수**: 클래스가 여러 이유로 변경되는지 확인
+2. **OCP 준수**: 새 기능 추가 시 기존 코드 수정 여부 확인
+3. **DIP 준수**: 인터페이스 또는 추상 클래스 사용
+
+### ✅ 코드 리뷰 시 체크리스트
+
+- [ ] 각 클래스가 단일 책임을 가지는가? (SRP)
+- [ ] 확장 시 기존 코드를 수정해야 하는가? (OCP)
+- [ ] 구체적인 클래스에 직접 의존하는가? (DIP)
+
+---
+
+## 6. 추가 학습 자료
 
 ### 📚 추천 도서
 1. **"Design Patterns: Elements of Reusable Object-Oriented Software"** - GoF
 2. **"Clean Code"** - Robert C. Martin
-3. **"Refactoring"** - Martin Fowler
+3. **"Clean Architecture"** - Robert C. Martin
 4. **"Head First Design Patterns"** - Eric Freeman
-5. **"Domain-Driven Design"** - Eric Evans
-
-### 🌐 온라인 리소스
-- [Refactoring.Guru](https://refactoring.guru) - 디자인 패턴 가이드
-- [Source Making](https://sourcemaking.com) - 디자인 패턴 & 안티패턴
-- [Clean Coders](https://cleancoders.com) - Robert Martin의 강의
-
-### 💡 실습 추천
-1. 기존 프로젝트에 디자인 패턴 적용해보기
-2. 오픈소스 프로젝트 분석하기
-3. 코드 리뷰에서 SOLID 원칙 적용하기
-4. 레거시 코드 리팩토링 연습
+5. **"Refactoring"** - Martin Fowler
 
 ---
 
-## 8. 결론
+## 7. 결론
 
-객체 지향 프로그래밍과 디자인 패턴은:
-- ✅ 코드의 **재사용성** 향상
-- ✅ **유지보수** 용이성 증대
-- ✅ **확장성** 있는 설계
-- ✅ 팀 간 **의사소통** 개선
-- ✅ **테스트** 가능한 코드 작성
+### SOLID 원칙의 핵심 가치
 
-**핵심 원칙**: 
-> "패턴을 위한 패턴은 피하고, 실제 문제를 해결하기 위해 적절한 패턴을 선택하라"
+| 원칙 | 핵심 가치 | 효과 |
+|-----|---------|------|
+| SRP | 단일 책임 | 유지보수성 향상 |
+| **OCP** | **확장/수정 분리** | **안정성 증가** |
+| LSP | 치환 가능성 | 다형성 보장 |
+| ISP | 인터페이스 분리 | 결합도 감소 |
+| **DIP** | **추상화 의존** | **유연성 증가** |
+
+**핵심 메시지**: 
+> "좋은 설계는 변경을 쉽게 만든다. SOLID 원칙은 변경 가능한 소프트웨어를 만드는 기초이다."
 
 ---
 
 **작성자**: OOP & Design Pattern Expert  
 **최종 수정**: 2025-12-11  
-**버전**: 1.0
+**버전**: 2.0
 
 📧 질문이나 제안사항이 있으시면 이슈를 등록해주세요!
