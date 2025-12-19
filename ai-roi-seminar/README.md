@@ -2,13 +2,13 @@
 
 
 
-\##  AI Seminars
+##  AI Seminars
 
 
 
-\### AI ROI Seminar  
+### AI ROI Seminar  
 
-\*\*왜 같은 AI인데 ROI는 이렇게 갈릴까?\*\*
+**왜 같은 AI인데 ROI는 이렇게 갈릴까?**
 
 
 
@@ -56,19 +56,19 @@ ai-roi-seminar/
 
 &nbsp;바로가기  
 
-\- \[AI ROI Seminar 메인 문서](./ai-roi-seminar/README.md)
+- \[AI ROI Seminar 메인 문서](./ai-roi-seminar/README.md)
 
 
 
 이 세미나는 다음을 다룹니다.
 
-\- Google Cloud vs MIT 연구 기반 AI ROI 격차 분석
+- Google Cloud vs MIT 연구 기반 AI ROI 격차 분석
 
-\- Microsoft 발언 기반 GPU·비용·인프라 현실
+- Microsoft 발언 기반 GPU·비용·인프라 현실
 
-\- AI/ML + Big Data + RTE + SI/SM 통합 도입 전략
+- AI/ML + Big Data + RTE + SI/SM 통합 도입 전략
 
-\- 경영진·실무자·IT 조직 공통 실행 프레임
+- 경영진·실무자·IT 조직 공통 실행 프레임
 
 
 
