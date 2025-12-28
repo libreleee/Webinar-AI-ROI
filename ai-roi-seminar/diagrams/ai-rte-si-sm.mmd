@@ -11,7 +11,7 @@ flowchart LR
   subgraph RTE[RTE: Real-Time Enterprise]
     CDC[CDC / Event Capture]
     MQ[Kafka / Pulsar]
-    STREAM[Stream Processing<br/>(Flink / Spark)]
+    STREAM["Stream Processing<br/>(Flink / Spark)"]
   end
 
   subgraph DATA[Big Data Platform]
@@ -29,8 +29,8 @@ flowchart LR
   subgraph OPS[SI / SM / 운영]
     API[API Gateway / Integration]
     MON[Monitoring / Logging / APM]
-    ITSM[ITIL: Incident/Problem/Change<br/>SLA/SLO]
-    SEC[Security / Access Control / Audit]
+    ITSM["ITIL: Incident/Problem/Change<br/>SLA/SLO"]
+    SEC["Security / Access Control / Audit"]
   end
 
   ERP --> CDC
@@ -50,4 +50,5 @@ flowchart LR
   MON --> ITSM
   SEC --> AI
   SEC --> DATA
+
 ```
