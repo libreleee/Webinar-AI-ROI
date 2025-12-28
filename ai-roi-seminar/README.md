@@ -1,74 +1,130 @@
+# AI 도입 전략 세미나
+## 왜 같은 AI인데 ROI는 이렇게 갈릴까?
+### — 데이터·조직·정보시스템(SI/SM) 관점에서 본 성공과 실패
+
 ---
 
+## 0. 왜 같은 AI인데 ROI가 이렇게 갈릴까? (맥락 정리)
 
+구글 클라우드 보고서에 따르면, 생성형 AI를 적극 도입한 기업의 다수가 **1년 안에 ROI를 경험**했다고 답합니다. 특히 “조기 도입 그룹”은 AI 예산의 절반 이상을 **AI 에이전트 및 자동화**에 집중하고, 고객 서비스·마케팅·보안·SW 개발 등 **핵심 업무를 AI 중심으로 재설계**해 빠른 성과를 냈습니다.
 
-##  AI Seminars
+- 출처(CIO, Google Cloud vs MIT 비교 기사):  
+  https://www.cio.com/article/4054344/%EA%B5%AC%EA%B8%80-1%EB%85%84-%EB%82%B4-%EC%84%B1%EA%B3%BC-vs-mit-95-%EC%8B%A4%ED%8C%A8%C2%B7%C2%B7%C2%B7ai-roi-%ED%8F%89%EA%B0%80%EB%8A%94-%EC%99%9C-%EC%97%87.html
 
+반대로, 위 CIO 기사에서 인용된 **MIT 연구**는 전체 AI 프로젝트의 **약 95%가 ROI 창출에 실패**한다고 분석합니다. 반복적으로 등장하는 실패 요인은 다음과 같습니다.
 
+- 기초 설계 부재
+- 비현실적인 기대
+- 데이터·인프라 부족
+- 조직 전체로 확장하는 과정의 난관
+- 인재 부족
 
-### AI ROI Seminar  
+또한 AITimes 기사에 인용된 **Microsoft 스타트업 담당자**는, 요즘 스타트업들이 **GPU 부족과 높은 비용** 때문에 AI 서비스를 제대로 굴리기 전에 사업을 접는 사례가 늘고 있다고 말합니다. AI 도입 병목이 모델 성능이 아니라 **인프라·비용·운영 현실**이라는 지적입니다.
 
-**왜 같은 AI인데 ROI는 이렇게 갈릴까?**
+- 출처(AITimes / Microsoft 발언):  
+  https://www.aitimes.com/news/articleView.html?idxno=203498
 
+👉 요약하면,
+- 예산·인재·데이터·인프라·조직 의지가 갖춰진 **소수 기업은 1년 내 ROI**
+- 준비 없이 “일단 해보자”로 시작한 **대다수는 실패**
 
+이 차이를 이해하는 것이 이 세미나의 출발점입니다.
 
-AI 도입 시 ROI가 갈리는 이유를  
+---
 
-경영·조직·데이터·정보시스템(SI/SM) 관점에서 정리한 세미나 자료입니다.
+## 1. 세미나 목적
 
+이 세미나는 “AI 기술 설명”이 아니라, **기업이 AI로 ROI를 내기 위해 무엇을 준비해야 하는지**를 경영·조직·데이터·정보시스템(SI/SM) 관점으로 정리합니다.
 
+---
 
-📂 디렉토리 구조:
+## 2. 핵심 메시지 (Key Takeaways)
 
+1) AI 실패 원인은 기술이 아니라 **구조(설계·조직·데이터·운영)**  
+2) AI는 “기능 추가”가 아니라 **정보시스템화**되는 프로젝트  
+3) AI 성능의 70%는 **데이터 품질·파이프라인**에서 결정  
+4) “자격 없는 담당자”가 맡으면 실패 확률이 급증  
+5) PoC 성공 ≠ 운영 성공 (SI/SM·ITSM 없으면 실패)  
+6) 경영진의 문제 정의·우선순위·투자 판단이 ROI를 좌우  
 
+---
 
-ai-roi-seminar/
+## 3. AI 도입 단계별 실행 프레임 (0→8)
 
-├── README.md                     # 세미나 메인 문서 (기사 링크 포함)
+### 3.1 1단계: 사전 준비 — 문제 정의·목표·ROI 프레임
+- “AI를 쓸 수 있을까?”가 아니라 **“어떤 문제를 해결할 것인가?”**
+- KPI/ROI를 파일럿 전에 수치로 고정
+- 리스크(보안·규제·프라이버시·윤리)를 초기 체크리스트에 포함
 
-├── slides/
+산출물 예:
+- AI 비전/목표 문서
+- 문제 리스트 & 우선순위
+- KPI/ROI 정의서(측정 방법 포함)
 
-│   ├── outline.md                # PPT 목차
+### 3.2 2단계: 조직·역량 진단 — 우리는 어디에 서 있나?
+AI 성공 기업의 공통점은 “적임자 + 운영 가능한 팀”.
 
-│   └── speaker-notes.md          #  슬라이드별 발표자 멘트
+필수 역량 조합:
+- AI/ML Engineering
+- Database Engineering
+- Big Data Engineering
+- SI(System Integration)
+- SM(System Management)
 
-├── qna/
+책임 구조:
+- C-level 스폰서 (우선순위·예산·저항 조정)
+- AI PMO/CoE (표준·공통 인프라·가이드)
+- 도메인 PO (현업 문제/데이터의 실제 주인)
 
-│   └── qna.md                    #  Q\&A 대비
+### 3.3 3단계: 데이터 인프라 — 빅데이터 구축 + RTE + ETL
+AI/ML 도입 시 학습·테스트·운영을 위한 데이터 구축은 대부분 **필수**입니다.
 
-├── executive-summary/
+RTE(Real-Time Enterprise):
+- 기업의 데이터를 실시간으로 연결하여
+- 기존 시스템에 부하 없이
+- 빅데이터 플랫폼으로 적재하는 구조
 
-│   └── one-page.md               #  경영진 1페이지 요약
+구성(예):
+- CDC → Kafka/Pulsar → Flink/Spark → Data Lake → ETL/ELT → Feature Store
 
-├── diagrams/
+### 3.4 4단계: Use Case 우선순위 선정
+- Impact × Feasibility
+- 빠른 ROI가 가능한 영역부터 (고객센터, 보안, 개발, 품질 등)
 
-│   └── ai-rte-si-sm.mmd          # RTE + AI + SI/SM 아키텍처
+### 3.5 5단계: PoC(8~12주) — “운영 가능성”까지 검증
+PoC에서 반드시 검증:
+- KPI 달성
+- 데이터 흐름(RTE→ETL→모델)
+- 비용(GPU/API)
+- 실제 사용자 경험(업무 반영)
 
-├── checklist/
+### 3.6 6단계: 운영 전환 — MLOps + DevOps + ITSM(=SM)
+AI는 PoC 이후 정보시스템이 됩니다. 운영 안정성 없이 ROI는 유지되지 않습니다.
 
-│   └── ai-adoption-checklist.md
+필수:
+- 모델/데이터 버전관리
+- Drift Monitoring & 재학습
+- SLA/SLO, 장애 대응(ITIL)
+- 보안/권한/감사 로그
 
-└── references/
+### 3.7 7단계: 전사 확산 — 프로세스 재설계
+- 업무 프로세스에 AI 내재화
+- 현업 교육/가이드
+- CoE 운영, 표준화
 
-&nbsp;   └── articles.md               # CIO + AITimes 기사 링크
+### 3.8 8단계: 거버넌스 — 보안·윤리·규제·성과관리
+- 개인정보/보안/규제 준수
+- 편향/윤리
+- 비용 최적화 & 성과 측정
+- 지속 개선(운영지표 기반)
 
+---
 
+## 4. 이 디렉토리 구성
 
-&nbsp;바로가기  
-
-- \[AI ROI Seminar 메인 문서](./ai-roi-seminar/README.md)
-
-
-
-이 세미나는 다음을 다룹니다.
-
-- Google Cloud vs MIT 연구 기반 AI ROI 격차 분석
-
-- Microsoft 발언 기반 GPU·비용·인프라 현실
-
-- AI/ML + Big Data + RTE + SI/SM 통합 도입 전략
-
-- 경영진·실무자·IT 조직 공통 실행 프레임
-
-
-
+- `slides/` : 발표 목차 + 발표자 멘트
+- `qna/` : 예상 질문/답변
+- `executive-summary/` : 경영진 1페이지 요약
+- `diagrams/` : RTE+SI/SM 아키텍처
+- `checklist/` : 도입 체크리스트
+- `references/` : 기사 링크/근거 자료

@@ -1,2 +1,53 @@
+```mermaid
 flowchart LR
-A-->B
+  subgraph BUS[기존 업무 시스템]
+    ERP[ERP]
+    MES[MES]
+    CRM[CRM]
+    WMS[WMS]
+    APP[Web/App]
+  end
+
+  subgraph RTE[RTE: Real-Time Enterprise]
+    CDC[CDC / Event Capture]
+    MQ[Kafka / Pulsar]
+    STREAM[Stream Processing<br/>(Flink / Spark)]
+  end
+
+  subgraph DATA[Big Data Platform]
+    DL[Data Lake]
+    ETL[ETL / ELT]
+    FS[Feature Store]
+  end
+
+  subgraph AI[AI / ML Platform]
+    TRAIN[Model Training]
+    SERVE[Model Serving]
+    MLOPS[MLOps]
+  end
+
+  subgraph OPS[SI / SM / 운영]
+    API[API Gateway / Integration]
+    MON[Monitoring / Logging / APM]
+    ITSM[ITIL: Incident/Problem/Change<br/>SLA/SLO]
+    SEC[Security / Access Control / Audit]
+  end
+
+  ERP --> CDC
+  MES --> CDC
+  CRM --> CDC
+  WMS --> CDC
+  APP --> CDC
+
+  CDC --> MQ --> STREAM --> DL
+  DL --> ETL --> FS --> TRAIN --> SERVE
+
+  SERVE --> API
+  API --> BUS
+
+  SERVE --> MON
+  MLOPS --> MON
+  MON --> ITSM
+  SEC --> AI
+  SEC --> DATA
+```
