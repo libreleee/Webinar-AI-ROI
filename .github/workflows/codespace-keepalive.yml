@@ -1,0 +1,34 @@
+name: Codespaces keep-alive (twice weekly)
+
+on:
+  schedule:
+    - cron: '0 0 * * 2' # 매주 화요일 00:00 UTC
+    - cron: '0 0 * * 5' # 매주 금요일 00:00 UTC
+  workflow_dispatch: {} # 수동 실행 가능
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y jq
+
+      - name: Install gh CLI
+        uses: cli/gh-action@v2
+
+      - name: Authenticate gh (use repo secret CODESPACE_PAT)
+        env:
+          GH_PAT: ${{ secrets.CODESPACE_PAT }}
+        run: |
+          echo "$GH_PAT" | gh auth login --with-token
+
+      - name: List Codespaces and briefly start/stop each to reset inactivity
+        run: |
+          gh codespace list --json name --limit 100 | jq -r '.[].name' | while read name; do
+            echo "Processing $name"
+            gh codespace start --name "$name" || true
+            sleep 45
+            gh codespace stop --name "$name" || true
+          done
