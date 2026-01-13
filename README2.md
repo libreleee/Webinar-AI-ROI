@@ -14,7 +14,7 @@
 - PoC에 머무르지 않고 **운영 시스템으로 빠르게 전환**
 
 > 출처 (CIO / Google Cloud vs MIT 비교 기사)  
-> https://www.cio.com/article/4054344/%EA%B5%AC%EA%B8%80-1%EB%85%84-%EB%82%B4-%EC%84%B1%EA%B3%BC-vs-mit-95-%EC%8B%A4%ED%8C%A8%C2%B7%C2%B7%C2%B7ai-roi-%ED%8F%89%EA%B0%80%EB%8A%94-%EC%99%9C-%EC%97%87.ht[...]
+> https://www.cio.com/article/4054344/%EA%B5%AC%EA%B8%80-1%EB%85%84-%EB%82%B4-%EC%84%B1%EA%B3%BC-vs-mit-95-%EC%8B%A4%ED%8C%A8%C2%B7%C2%B7%C2%B7ai-roi-%ED%8F%89%EA%B0%80%EB%8A%94-%EC%99%9C-%EC%97%8[...]
 
 반대로, 동일 기사에서 인용된 **MIT 연구**는  
 **전체 AI 프로젝트의 약 95%가 ROI 창출에 실패**한다고 분석합니다.
@@ -164,7 +164,7 @@ AI는 이미 두 번의 대규모 실패를 경험했다.
 
 그러므로 AI 성능을 좌우하는 가장 중요한 요소는 모델 자체가 아니라 데이터가 되어버렸습니다.
 
-➡ 모델은 공개 모델을 쓰면 된다 (ML/DL: scikit-learn, XGBoost, TensorFlow, PyTorch; LLM: LLaMA, GPT, Claude 등)  
+➡ 모델은 공개 모델을 쓰면 된다 (ML: scikit-learn, XGBoost; DL: TensorFlow, PyTorch — CNN, RNN, LSTM, GRU, Autoencoder, ResNet, UNet; LLM: LLaMA, GPT, Claude 등)
 ➡ 차별화는 “어떤 데이터로 학습시키느냐”에서 발생
 
 ✔ 2. 데이터 기반 AI 프로세스(현대 AI 파이프라인)
