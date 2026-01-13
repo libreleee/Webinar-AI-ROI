@@ -14,7 +14,7 @@
 - PoC에 머무르지 않고 **운영 시스템으로 빠르게 전환**
 
 > 출처 (CIO / Google Cloud vs MIT 비교 기사)  
-> https://www.cio.com/article/4054344/%EA%B5%AC%EA%B8%80-1%EB%85%84-%EB%82%B4-%EC%84%B1%EA%B3%BC-vs-mit-95-%EC%8B%A4%ED%8C%A8%C2%B7%C2%B7%C2%B7ai-roi-%ED%8F%89%EA%B0%80%EB%8A%94-%EC%99%9C-%EC%97%8[...]
+> https://www.cio.com/article/4054344/%EA%B5%AC%EA%B8%80-1%EB%85%84-%EB%82%B4-%EC%84%B1%EA%B3%BC-vs-mit-95-%EC%8B%A4%ED%8C%A8%C2%B7%C2%B7%C2%B7ai-roi-%ED%8F%89%EA%B0%80%EB%8A%94-%EC%99%9C-%EC%97%8C%E2%80%A6
 
 반대로, 동일 기사에서 인용된 **MIT 연구**는  
 **전체 AI 프로젝트의 약 95%가 ROI 창출에 실패**한다고 분석합니다.
@@ -34,7 +34,7 @@ AI 서비스를 제대로 운영해보기도 전에 사업을 접고 있다고 �
 > https://www.aitimes.com/news/articleView.html?idxno=203498
 
 ### 요약하면
-- **예산 · 인재 · 데이터 · 인프라 · 조직 의지**가 갖춰진 소수 기업은 1년 내 ROI
+- **예산 · 인재 ·데이터 · 인프라 · 조직 의지**가 갖춰진 소수 기업은 1년 내 ROI
 - 준비 없이 “일단 해보자”로 시작한 대다수는 실패
 - 이 격차는 우연이 아니라 **역사적으로 반복된 구조적 문제**
 
@@ -164,7 +164,7 @@ AI는 이미 두 번의 대규모 실패를 경험했다.
 
 그러므로 AI 성능을 좌우하는 가장 중요한 요소는 모델 자체가 아니라 데이터가 되어버렸습니다.
 
-➡ 모델은 공개 모델을 쓰면 된다 (ML: scikit-learn, XGBoost; DL: TensorFlow, PyTorch — CNN, RNN, LSTM, GRU, Autoencoder, ResNet, UNet; LLM: LLaMA, GPT, Claude 등)
+➡ 모델은 공개 모델을 쓰면 된다 (ML: scikit-learn, XGBoost; DL: TensorFlow, PyTorch — CNN(ResNet, EfficientNet), RNN(LSTM, GRU, BiLSTM), Autoencoder(AE, VAE), GAN(DCGAN 등), U-Net, Transformer 등; LLM: LLaMA, GPT, Claude 등)  
 ➡ 차별화는 “어떤 데이터로 학습시키느냐”에서 발생
 
 ✔ 2. 데이터 기반 AI 프로세스(현대 AI 파이프라인)
@@ -227,7 +227,7 @@ DE는 다음을 담당합니다:
 - 대규모 데이터 저장/처리 파이프라인 구축
 
 📌 LLM 시대에는 DE(데이터 엔지니어링)가 더 중요해집니다.  
-LLM 학습에는 수백억~수조 토큰의 데이터가 필요하기 때문입니다.
+LLM 학습에는 수백억~수조 토���의 데이터가 필요하기 때문입니다.
 
 ✔ 7. LLM 시대에는 데이터 분야가 더 중요해짐
 딥러닝 시대의 진실: 좋은 모델 < 좋은 데이터
